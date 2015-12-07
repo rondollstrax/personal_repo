@@ -5,7 +5,8 @@ def minpal(string):
     str1 = str2[:]
     if str1 == str1[-1::-1]:
         return 0
-    pivot = float(len(string))/2 - 0.5
+    #pivot = float(len(string))/2 - 1.5
+    pivot = 0
     print pivot
     afp = 1
     ins = 0
