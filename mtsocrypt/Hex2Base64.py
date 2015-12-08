@@ -53,6 +53,15 @@ def single_char_xor(string1):
                 break
     return '\n'.join(org)
 
+def str_to_bin(string):
+    splist = [c for c in string]
+    binlist = [bin(ord(c)) for c in splist]
+    return ''.join(binlist).replace('0b', '').zfill(8)
+    
+
+    
+
+
 def detect_xor_hex():
     url = "http://cryptopals.com/static/challenge-data/4.txt"
     dataobj = urllib2.urlopen(url)
@@ -62,4 +71,6 @@ def detect_xor_hex():
 
 
 if __name__ == '__main__':
-    print xor_ice("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal")
+    print str_to_bin('this is a test')
+    print str_to_bin('wokka wokka!!!')
+    print sum(str_to_bin('this is a test')[i] == str_to_bin('wokka wokka!!!')[i] for i in range(len(str_to_bin('this is a test'))))
