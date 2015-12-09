@@ -13,15 +13,15 @@ def xor_ice(string):
     xorkeylist = [hex(ord('I'))[2:], hex(ord('C'))[2:], hex(ord('E'))[2:]]
     hexstring = hexify_string(string)
     xorkey = ''
-    for i in range(0, len(hexstring), 2):
+    for i in range(0, len(hexstring)*2, 2):
         xorkey += xorkeylist[i/2 % 3]
     return xor_hexstring(hexstring, xorkey)
 
 def hexify_string(string):
     lst = [c for c in string]
     for item in range(0, len(lst)):
-        lst[item] = str(hex(ord(lst[item])))
-    return ''.join(lst).replace('0x', '')
+        lst[item] = str(hex(ord(lst[item])))[2:].zfill(2)
+    return ''.join(lst)
 
 def hex_string_to_hexnumlist(string):
     splist = [c for c in string]
@@ -55,9 +55,13 @@ def single_char_xor(string1):
 
 def str_to_bin(string):
     splist = [c for c in string]
-    binlist = [bin(ord(c)) for c in splist]
-    return ''.join(binlist).replace('0b', '').zfill(8)
-    
+    binlist = [bin(ord(c))[2:].zfill(8) for c in string]
+    return ''.join(binlist)
+ 
+def binary_hamming(string1, string2):
+    if len(string1) != len(string2):
+        return 'Hamming distance is between 2 equal lenghted strings'
+    return sum(str_to_bin(string1)[i] != str_to_bin(string2)[i] for i in range(len(str_to_bin(string2))))
 
     
 
@@ -71,6 +75,5 @@ def detect_xor_hex():
 
 
 if __name__ == '__main__':
-    print str_to_bin('this is a test')
-    print str_to_bin('wokka wokka!!!')
-    print sum(str_to_bin('this is a test')[i] == str_to_bin('wokka wokka!!!')[i] for i in range(len(str_to_bin('this is a test'))))
+    print xor_ice('Burning \'em, if you ain\'t quick and nimble\nI go crazy when I hear a cymbal')
+
