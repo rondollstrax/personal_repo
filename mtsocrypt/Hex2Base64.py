@@ -1,4 +1,4 @@
-import base64, urllib2
+import base64, urllib2, requests
 def hex_string_to_b64(string):
     hexlist = hex_string_to_hexnumlist(string)
     translated_string = ''
@@ -8,6 +8,9 @@ def hex_string_to_b64(string):
 
 def hex_string_to_ascii(string):
     return base64.b64decode(hex_string_to_b64(string))
+
+def hex_to_str(string):
+    return ''.join([chr(int(string[c] + string[c+1])) for c in range(0, len(string), 2)]) 
 
 def xor_ice(string):
     xorkeylist = [hex(ord('I'))[2:], hex(ord('C'))[2:], hex(ord('E'))[2:]]
@@ -63,7 +66,8 @@ def binary_hamming(string1, string2):
         return 'Hamming distance is between 2 equal lenghted strings'
     return sum(str_to_bin(string1)[i] != str_to_bin(string2)[i] for i in range(len(str_to_bin(string2))))
 
-    
+def read_url_text(url):
+    return requests.get(url).text
 
 
 def detect_xor_hex():
@@ -73,7 +77,19 @@ def detect_xor_hex():
     hexlist = map(lambda x: x.replace('\n', ''), hexlistNL)
     print map(single_char_xor, hexlist)
 
+def detect_keysize():
+    enc = read_url_text('http://cryptopals.com/static/challenge-data/6.txt')
+    topfour = [100, 100, 100, 100]
+    keys = [100, 100, 100, 100]
+    for keysize in range(2, 41):
+        first = enc[:keysize]
+        second = enc[keysize:keysize + keysize]
+        hamdis = float(binary_hamming(first, second))/float(keysize)
+        if hamdis < max(topfour):
+            ind = topfour.index(max(topfour))
+            topfour[ind] = hamdis
+            keys[ind] = keysize   
+    return keysize
 
 if __name__ == '__main__':
-    print xor_ice('Burning \'em, if you ain\'t quick and nimble\nI go crazy when I hear a cymbal')
-
+    
