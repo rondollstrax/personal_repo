@@ -200,7 +200,9 @@ def find_key():
     return "Terminator X: Bring the noise"
     #return  ''.join(map(break_single_char_xor, ft))
 
-if __name__ == '__main__':
+def cSix():
     enc = hexify_string(base64.b64decode(read_url_text('http://cryptopals.com/static/challenge-data/6.txt')))
     key = hexify_string(find_key())
-    print hex_to_str(xor_hexstring(*repeating_xor(enc, key)))
+    return hex_to_str(xor_hexstring(*repeating_xor(enc, key)))
+
+if __name__ == '__main__':
