@@ -1,5 +1,5 @@
 import base64, urllib2, requests
-
+from Crypto.Cipher import AES
 def repeating_xor(longs, shorts):
     if len(longs) < len(shorts):
         raise ValueError
@@ -204,5 +204,15 @@ def cSix():
     enc = hexify_string(base64.b64decode(read_url_text('http://cryptopals.com/static/challenge-data/6.txt')))
     key = hexify_string(find_key())
     return hex_to_str(xor_hexstring(*repeating_xor(enc, key)))
+
+def decrypt_AES_ECB(text, key):
+    mode = AES.MODE_ECB   
+    dec = AES.new(key, mode)
+    return dec.decrypt(text)
+
+def detect_same(text):
+    tries = text.split('\n')
+
+
 
 if __name__ == '__main__':
