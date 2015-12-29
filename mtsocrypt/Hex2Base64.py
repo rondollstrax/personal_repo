@@ -1,4 +1,4 @@
-import base64, urllib2, requests
+import base64, urllib2, requests, random, hashlib
 from Crypto.Cipher import AES
 def repeating_xor(longs, shorts):
     if len(longs) < len(shorts):
@@ -212,7 +212,30 @@ def decrypt_AES_ECB(text, key):
 
 def detect_same(text):
     tries = text.split('\n')
+    for item in tries:
+        l = [item[i:i+16] for i in range(0, len(item), 16)]
+        lst = [i for i, x in enumerate(l) if l.count(x) > 1]
+        if len(lst) > 0:
+            return item
+def cEight():
+    return detect_same(read_url_text("http://cryptopals.com/static/challenge-data/8.txt"))
 
+def pad_block(text, length):
+    pad = max(len(text), length) % min(len(text), length)
+    return text + '\x04'* pad
 
+def cNine():
+    return "%r" % pad_block('YELLOW SUBMARINE', 20)
+
+def diffie_helman_key():
+    g = 2
+    p = 37
+    a = random.randint(1000, 10000)
+    b = random.randint(1000, 10000)
+    A = pow(g, a, p)
+    B = pow(g, b, p)
+    s = str(pow(A, b, p)) #equal to pow(B,a,p)
+    return hashlib.sha256(s).digest()
 
 if __name__ == '__main__':
+    print diffie_helman_key()
