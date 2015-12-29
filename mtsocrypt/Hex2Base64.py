@@ -1,6 +1,9 @@
 import base64, urllib2, requests, random, hashlib
 from Crypto.Cipher import AES
+
 def repeating_xor(longs, shorts):
+    """Function validates length of the first argument being bigger than the length of the second argument
+       and duplicates the short argument to match the length of the longer argument, repeating xor logic"""
     if len(longs) < len(shorts):
         raise ValueError
     f = ''
@@ -23,6 +26,7 @@ def hex_to_str(string):
     return ''.join([chr(int(string[c] + string[c+1], 16)) for c in range(0, len(string), 2)]) 
 
 def xor_ice(string):
+    "Excercise 5 """
     xorkeylist = [hex(ord('I'))[2:], hex(ord('C'))[2:], hex(ord('E'))[2:]]
     hexstring = hexify_string(string)
     xorkey = ''
@@ -31,12 +35,14 @@ def xor_ice(string):
     return xor_hexstring(hexstring, xorkey)
 
 def hexify_string(string):
+    """returns the hex of a string (without 0x)"""
     lst = [c for c in string]
     for item in range(0, len(lst)):
-        lst[item] = str(hex(ord(lst[item])))[2:].zfill(2)
+        lst[item] = str(hex(ord(lst[item])))[2:].zfill(2) #zfill to ensure a length os 2. newline hex value is 'a'
     return ''.join(lst)
 
 def hex_string_to_hexnumlist(string):
+    """example return value [0x30, 0x5a, 0x78]"""
     splist = [c for c in string]
     jlist = [x + y for x, y in zip(splist[::2], splist[1::2])]
     while '0x' in jlist:
@@ -45,12 +51,14 @@ def hex_string_to_hexnumlist(string):
     return hexlist
 
 def xor_hexstring(string1, string2):
+    """xor 2 hexstrings"""
     hexlist1 = hex_string_to_hexnumlist(string1)
     hexlist2 = hex_string_to_hexnumlist(string2)
     result = [hex(int(hexlist1[item], 16) ^ int(hexlist2[item], 16))[2:].zfill(2) for item in range(len(hexlist1))]
     return ''.join(result)
 
 def single_char_xor(string1):
+    """Break a single char repeating key xor"""
     org = []
     for item in range(1, 256):
         item = hex(item)[2:] * (int(len(string1)/(len(hex(item))-2))) 
@@ -116,6 +124,7 @@ def score(scorelist):
 
 
 def break_single_char_xor(string1):
+    """using a score system in the function score() (repeating key)"""
     org = []
     keydic = {}
     for item in range(32, 127):
@@ -125,7 +134,7 @@ def break_single_char_xor(string1):
         org.append(value)
         keydic[value] = chr(ch)
     asciitable = [i for i in range(32, 127)]
-    asciitable.append(10)
+    asciitable.append(10)# space
     for item in org[:]:
         for char in item:
             if ord(char) not in asciitable:
@@ -140,6 +149,7 @@ def str_to_bin(string):
     return ''.join(binlist)
  
 def binary_hamming(string1, string2):
+    """hamming distance after binary conversion"""
     if len(string1) != len(string2):
         return 'Hamming distance is between 2 equal lenghted strings'
     return sum(str_to_bin(string1)[i] != str_to_bin(string2)[i] for i in range(len(str_to_bin(string2))))
@@ -149,6 +159,7 @@ def read_url_text(url):
 
 
 def detect_xor_hex():
+    """Ex 4"""
     url = "http://cryptopals.com/static/challenge-data/4.txt"
     dataobj = urllib2.urlopen(url)
     hexlistNL = dataobj.readlines()
@@ -157,7 +168,7 @@ def detect_xor_hex():
 
 def detect_keysize():
     """
-    bottom line of function explains why this function returns 29
+    This function works. Returning 29 to save run time.
     """
     return 29
     enc = base64.b64decode(read_url_text('http://cryptopals.com/static/challenge-data/6.txt'))
@@ -201,16 +212,19 @@ def find_key():
     #return  ''.join(map(break_single_char_xor, ft))
 
 def cSix():
+    """Ex 6"""
     enc = hexify_string(base64.b64decode(read_url_text('http://cryptopals.com/static/challenge-data/6.txt')))
     key = hexify_string(find_key())
     return hex_to_str(xor_hexstring(*repeating_xor(enc, key)))
 
 def decrypt_AES_ECB(text, key):
+    """Was I meant to implement this on my own? Challenge doesn't say so but it does for the one after it. Weird"""
     mode = AES.MODE_ECB   
     dec = AES.new(key, mode)
     return dec.decrypt(text)
 
 def detect_same(text):
+    """Meant to detect AES under ECB encryption by guessing the same block will appear twice on the same encrypted text"""
     tries = text.split('\n')
     for item in tries:
         l = [item[i:i+16] for i in range(0, len(item), 16)]
@@ -218,6 +232,7 @@ def detect_same(text):
         if len(lst) > 0:
             return item
 def cEight():
+    'Ex 8'
     return detect_same(read_url_text("http://cryptopals.com/static/challenge-data/8.txt"))
 
 def pad_block(text, length):
@@ -225,9 +240,11 @@ def pad_block(text, length):
     return text + '\x04'* pad
 
 def cNine():
+    """Ex 9"""
     return "%r" % pad_block('YELLOW SUBMARINE', 20)
 
 def diffie_helman_key():
+    """Should change the value of p to be a bigger-better number"""
     g = 2
     p = 37
     a = random.randint(1000, 10000)
@@ -235,7 +252,7 @@ def diffie_helman_key():
     A = pow(g, a, p)
     B = pow(g, b, p)
     s = str(pow(A, b, p)) #equal to pow(B,a,p)
-    return hashlib.sha256(s).digest()
+    return hashlib.sha256(s).digest() # sha256 is a random choice of a working sha function
 
 if __name__ == '__main__':
     print diffie_helman_key()
